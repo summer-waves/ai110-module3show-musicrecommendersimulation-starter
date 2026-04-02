@@ -1,111 +1,56 @@
 # 🎧 Model Card: Music Recommender Simulation
 
-## 1. Model Name  
+## 1. Model Name
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
-
----
-
-## 2. Intended Use  
-
-Describe what your recommender is designed to do and who it is for. 
-
-Prompts:  
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+VibeFinder 1.0
 
 ---
 
-## 3. How the Model Works  
+## 2. Intended Use
 
-Explain your scoring approach in simple language.  
-
-Prompts:  
-
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+VibeFinder 1.0 suggests songs from a small catalog based on a user's preferred genre, mood, energy level, and acoustic preference. It is designed for classroom exploration of how content-based recommendation systems work — not for real-world deployment. It assumes the user can clearly state their preferences upfront and that those preferences stay constant.
 
 ---
 
-## 4. Data  
+## 3. How the Model Works
 
-Describe the dataset the model uses.  
-
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+The system looks at each song in the catalog and compares it to what the user told us they like. It awards points for matches: a genre match is worth the most (2 points), a mood match is worth 1 point, and energy closeness adds up to 1.5 points depending on how close the song's energy level is to what the user wants. If the user prefers acoustic music and the song is mostly acoustic, it gets a small bonus too. Every song gets a total score, and the top 5 are returned along with a plain-language explanation of why each one ranked where it did.
 
 ---
 
-## 5. Strengths  
+## 4. Data
 
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+The catalog contains 10 songs stored in a CSV file. Genres represented include pop, rock, lofi, and electronic. Moods include happy, chill, and intense. The dataset is small and skewed — there are no acoustic genre songs, no jazz, no classical, and no R&B. Most songs lean toward pop and electronic, which means users with those preferences get better results than users with niche tastes. The data reflects a fairly narrow slice of what music actually sounds like across cultures and styles.
 
 ---
 
-## 6. Limitations and Bias 
+## 5. Strengths
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+The system works well for users whose preferences match the most common genres in the catalog. A happy pop fan or a high-energy rock listener gets clearly differentiated, sensible results. The explanation feature is a genuine strength — every recommendation tells the user exactly why it was chosen, which makes the system transparent and easy to understand. The scoring logic is also simple enough to debug and adjust, which is useful for learning.
 
 ---
 
-## 7. Evaluation  
+## 6. Limitations and Bias
 
-How you checked whether the recommender behaved as expected. 
-
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
+The biggest limitation is the small catalog — with only 10 songs, the same tracks keep appearing across very different profiles. The genre weight of 2.0 is so dominant that it can overshadow a much better mood or energy match from a different genre. The system has no acoustic genre songs at all, so a user who prefers acoustic music never gets a genre match bonus. It also treats all preferences as equally important to all users, with no way to say "I care a lot about mood but barely about genre." This could feel unfair to users whose taste doesn't fit the pop/rock/electronic mold that the dataset was built around.
 
 ---
 
-## 8. Future Work  
+## 7. Evaluation
 
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+Three distinct user profiles were tested: a Happy Pop Fan (high energy, pop genre), a Chill Acoustic Listener (low energy, acoustic preference), and a High Energy Rock Fan (very high energy, rock genre). For Profile 1, results matched expectations well — genre and mood aligned with the top picks. For Profile 2, results were weaker because no songs matched the "acoustic" genre, so the system fell back on mood and acousticness scores alone. For Profile 3, Storm Runner ranked first as expected, but no songs matched the "intense" mood, which exposed a gap in the dataset. The most surprising finding was that Gym Hero kept appearing in multiple profiles because its high energy made it competitive even when genre and mood didn't match.
 
 ---
 
-## 9. Personal Reflection  
+## 8. Future Work
 
-A few sentences about your experience.  
+- Expand the catalog to at least 50 songs with more diverse genres including jazz, classical, R&B, and acoustic
+- Add a diversity rule that prevents the same artist from appearing more than once in the top 5
+- Allow users to weight their own preferences, for example letting someone say mood matters more to them than genre
+- Add tempo range matching so users who want slow or fast songs get better results
 
-Prompts:  
+---
 
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+## 9. Personal Reflection
+
+Building this system showed me how much a few simple numbers can shape what someone sees and hears. A weight of 2.0 on genre sounds small, but it means the algorithm will almost always push the same genre to the top regardless of everything else. That is exactly how real apps create filter bubbles — not through some complex conspiracy, but through small scoring decisions made early on that compound over millions of recommendations. The most interesting moment was seeing Gym Hero show up for both the pop fan and the rock fan just because of its energy score. It made me realize that real music taste is way more complicated than any small set of features can capture, and that human curation still matters even when the algorithm seems to be working fine.
